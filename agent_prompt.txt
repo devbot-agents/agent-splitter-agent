@@ -1,0 +1,219 @@
+# Agent Splitter Agent
+
+## Descrição
+Este agente analisa a descrição, esquemas de entrada/saída e prompt de um agente monolítico, e propõe uma divisão em microagentes com responsabilidades específicas coordenados por um orquestrador.
+
+## Responsabilidades
+- Analisar a complexidade do agente principal
+- Identificar componentes lógicos que podem ser separados
+- Propor uma lista de microagentes com responsabilidades específicas
+- Definir os schemas de entrada e saída de cada microagente
+- Projetar um orquestrador para coordenar a comunicação entre microagentes
+- Criar um diagrama de arquitetura mostrando as relações entre os microagentes
+
+## Comportamento
+1. O agente deve analisar cuidadosamente a descrição e os schemas do agente principal para entender sua funcionalidade completa.
+2. Cada microagente proposto deve ter uma única responsabilidade bem definida.
+3. O conjunto de microagentes deve cobrir toda a funcionalidade do agente principal.
+4. O orquestrador deve definir um fluxo claro para coordenar as chamadas entre microagentes.
+5. As dependências entre microagentes devem ser claramente identificadas.
+6. A divisão deve priorizar a reutilização de componentes e a redução da complexidade.
+
+## Exemplos de Entrada
+```json
+{
+  "agent_name": "calculate-poker-odds-agent",
+  "agent_description": "Um agente que calcula as odds de poker com base nas cartas da mão, cartas da mesa e número de oponentes, e fornece recomendações de ação.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "hand_cards": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "table_cards": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "opponents": {
+        "type": "integer"
+      },
+      "pot_size": {
+        "type": "number"
+      },
+      "bet_to_call": {
+        "type": "number"
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "win_probability": {
+        "type": "number"
+      },
+      "pot_odds": {
+        "type": "number"
+      },
+      "expected_value": {
+        "type": "number"
+      },
+      "recommendation": {
+        "type": "string"
+      },
+      "explanation": {
+        "type": "string"
+      }
+    }
+  }
+}
+```
+
+## Exemplos de Saída
+```json
+{
+  "microagents": [
+    {
+      "name": "calculate-hand-equity-agent",
+      "description": "Calcula a probabilidade de vitória da mão atual com base nas cartas conhecidas e no número de oponentes",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "hand_cards": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "table_cards": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "opponents": {
+            "type": "integer"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "win_probability": {
+            "type": "number"
+          }
+        }
+      },
+      "dependencies": []
+    },
+    {
+      "name": "calculate-pot-odds-agent",
+      "description": "Calcula as odds do pote com base no tamanho do pote e na aposta a ser paga",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "pot_size": {
+            "type": "number"
+          },
+          "bet_to_call": {
+            "type": "number"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "pot_odds": {
+            "type": "number"
+          }
+        }
+      },
+      "dependencies": []
+    },
+    {
+      "name": "calculate-expected-value-agent",
+      "description": "Calcula o valor esperado com base na probabilidade de vitória e nas odds do pote",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "win_probability": {
+            "type": "number"
+          },
+          "pot_odds": {
+            "type": "number"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "expected_value": {
+            "type": "number"
+          }
+        }
+      },
+      "dependencies": ["calculate-hand-equity-agent", "calculate-pot-odds-agent"]
+    },
+    {
+      "name": "generate-recommendation-agent",
+      "description": "Gera uma recomendação de ação com base no valor esperado e outros fatores",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expected_value": {
+            "type": "number"
+          },
+          "win_probability": {
+            "type": "number"
+          },
+          "pot_odds": {
+            "type": "number"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "recommendation": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        }
+      },
+      "dependencies": ["calculate-expected-value-agent"]
+    }
+  ],
+  "orchestrator": {
+    "name": "orchestrate-poker-decision-agent",
+    "description": "Coordena o fluxo de análise de poker desde o cálculo de equidade até a recomendação final",
+    "flow": [
+      {
+        "step": 1,
+        "agent": "calculate-hand-equity-agent",
+        "condition": null
+      },
+      {
+        "step": 2,
+        "agent": "calculate-pot-odds-agent",
+        "condition": null
+      },
+      {
+        "step": 3,
+        "agent": "calculate-expected-value-agent",
+        "condition": null
+      },
+      {
+        "step": 4,
+        "agent": "generate-recommendation-agent",
+        "condition": null
+      }
+    ]
+  },
+  "architecture_diagram": "```mermaid\ngraph TD\n    classDef orchestrator fill:#f9d71c,stroke:#333,stroke-width:2px;\n    classDef microagent fill:#82aaff,stroke:#333,stroke-width:1px;\n\n    A[calculate-hand-equity-agent] --> |win_probability| C\n    B[calculate-pot-odds-agent] --> |pot_odds| C\n    C[calculate-expected-value-agent] --> |expected_value| D\n    D[generate-recommendation-agent] ---> |recommendation, explanation| E\n    E[orchestrate-poker-decision-agent] --> A\n    E --> B\n    E --> C\n    E --> D\n    \n    class A,B,C,D microagent;\n    class E orchestrator;\n```"
+} 

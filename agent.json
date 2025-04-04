@@ -1,0 +1,107 @@
+{
+  "name": "agent-splitter-agent",
+  "description": "Divide a funcionalidade de um agente principal em microagentes com responsabilidades únicas e comunicação clara entre eles",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "agent_name": {
+        "type": "string",
+        "description": "Nome do agente principal a ser dividido"
+      },
+      "agent_description": {
+        "type": "string",
+        "description": "Descrição completa do agente principal a ser dividido"
+      },
+      "input_schema": {
+        "type": "object",
+        "description": "Schema de entrada do agente principal"
+      },
+      "output_schema": {
+        "type": "object",
+        "description": "Schema de saída do agente principal"
+      },
+      "agent_prompt": {
+        "type": "string",
+        "description": "Prompt detalhado do agente principal, se disponível"
+      }
+    },
+    "required": ["agent_name", "agent_description", "input_schema", "output_schema"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "microagents": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nome do microagente"
+            },
+            "description": {
+              "type": "string",
+              "description": "Descrição da responsabilidade específica do microagente"
+            },
+            "input_schema": {
+              "type": "object",
+              "description": "Schema de entrada esperado pelo microagente"
+            },
+            "output_schema": {
+              "type": "object",
+              "description": "Schema de saída fornecido pelo microagente"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Nomes dos microagentes dos quais este depende"
+            }
+          }
+        },
+        "description": "Lista de microagentes que compõem o agente principal"
+      },
+      "orchestrator": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nome do agente orquestrador"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição da função do orquestrador"
+          },
+          "flow": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step": {
+                  "type": "integer",
+                  "description": "Número da etapa no fluxo"
+                },
+                "agent": {
+                  "type": "string",
+                  "description": "Nome do microagente a ser chamado nesta etapa"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Condição opcional para executar esta etapa"
+                }
+              }
+            },
+            "description": "Fluxo de execução dos microagentes"
+          }
+        },
+        "description": "Definição do agente orquestrador que coordena os microagentes"
+      },
+      "architecture_diagram": {
+        "type": "string",
+        "description": "Diagrama de arquitetura em formato de texto representando a relação entre os microagentes"
+      }
+    },
+    "required": ["microagents", "orchestrator"]
+  }
+} 
