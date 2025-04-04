@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Este script é um guia para configurar o deploy no Render
+# Precisa ser executado manualmente
+
+echo "===== Guia para deploy do agent-splitter-agent no Render ====="
+echo ""
+echo "1. Acesse https://dashboard.render.com/"
+echo "2. Clique em \"New\" e selecione \"Web Service\""
+echo "3. Conecte ao GitHub e selecione o repositório devbot-agents/agent-splitter-agent"
+echo "4. Configure o serviço como segue:"
+echo "   - Nome: agent-splitter-agent"
+echo "   - Ambiente: Python"
+echo "   - Build Command: pip install -r requirements.txt"
+echo "   - Start Command: uvicorn app.main:app --host 0.0.0.0 --port \$PORT"
+echo "5. Em Variáveis de Ambiente, configure:"
+echo "   - OPENAI_API_KEY = sua_chave_api_openai"
+echo "   - PYTHON_VERSION = 3.11.4"
+echo "6. No tipo do plano, escolha o \"Free\""
+echo "7. Clique em \"Create Web Service\""
+echo ""
+echo "Após o deploy, sua API estará disponível em:"
+echo "https://agent-splitter-agent.onrender.com"
+echo ""
+echo "Você pode testar o endpoint de saúde em:"
+echo "https://agent-splitter-agent.onrender.com/health"
+echo ""
+echo "A documentação OpenAPI estará em:"
+echo "https://agent-splitter-agent.onrender.com/docs"
+echo ""
+echo "===== Fim do guia =====" 
